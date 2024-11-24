@@ -23,8 +23,25 @@ footer{
     cursor: pointer;
 }
 
+@keyframes icons-floating {
+    0%{
+        transform: translateY(0px);
+    }
+    50%{
+        transform: translateY(-10px)
+    }
+    100%{
+        transform: translateY(0px);
+    }
+}
+
 .footer-icons__img {
     width: 35px;
+    
+}
+
+.footer-icons:hover .footer-icons__img {
+    animation: 1.5s icons-floating;
 }
 
 .footer-icons__disc{
