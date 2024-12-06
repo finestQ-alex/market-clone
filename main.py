@@ -1,10 +1,14 @@
-from fastapi import FastAPI, UploadFile, Form, Request
+from fastapi import FastAPI, UploadFile, Form, Request, Depends
 from fastapi.staticfiles import StaticFiles
 from typing import Annotated
 from fastapi.middleware.cors import CORSMiddleware
 import sqlite3
 from fastapi.responses import JSONResponse, Response
 from fastapi.encoders import jsonable_encoder
+from fastapi_login import LoginManager
+from fastapi_login.exceptions import InvalidCredentialsException
+from fastapi.security import APIKeyHeader
+
 con = sqlite3.connect('db.db', check_same_thread=False)
 cur = con.cursor()
 
@@ -21,6 +25,9 @@ cur.execute(f"""
             );
             """)
 app = FastAPI()
+SECRET = "fastapi"
+login_manager = LoginManager(SECRET, "/login")
+api_key_header = APIKeyHeader(name="Authorization")
 
 @app.post("/items")
 async def create_item(
@@ -63,7 +70,7 @@ async def create_item(
         print(str(e))
         
 @app.get("/items")
-def get_item_list():
+async def get_item_list(token: str = Depends(APIKeyHeader(name="Authorization"))): 
     con.row_factory = sqlite3.Row
     cur = con.cursor()
     cur.execute('SELECT * FROM items')
@@ -80,6 +87,53 @@ def get_image(item_id):
                              """).fetchone()[0]
     
     return Response(content=bytes.fromhex(image_byte))
+
+@app.post('/signup')
+def signup(
+    id:Annotated[str,Form()],
+    password:Annotated[str,Form()],
+    name :Annotated[str,Form()],
+    email : Annotated[str,Form()]
+    ):
+    cur.execute(f"""
+                INSERT INTO users(id, name, email, password)
+                VALUES ('{id}','{name}','{email}','{password}')
+                """)
+    con.commit()
+    print(id, password, name, email)
+    return "200"
+
+@login_manager.user_loader()
+def get_query_user(id):
+    con.row_factory = sqlite3.Row
+    cur = con.cursor()
+    user  = cur.execute(f"""
+                        SELECT * FROM users WHERE id = '{id}'
+                        """).fetchone()
+    return user
+
+
+@app.post('/login')
+def login(
+    id : Annotated[str,Form()],
+    password : Annotated[str, Form()]
+    ):
+    
+    user  = get_query_user(id)
+    print(password)
+    print(user['password'])
+    if not user:
+        raise InvalidCredentialsException
+    elif password != user['password']:
+        raise InvalidCredentialsException
+    
+    token = login_manager.create_access_token(data={"sub":{
+        "id" : user['id'],
+        "name" : user['name'],
+        "email" : user['email']
+    }})
+    return {"access_token" : token}
+
 
 
 app.mount("/", StaticFiles(directory="frontend", html=True), name="frontend")
