@@ -16,6 +16,7 @@
   },
   "dependencies": {
     "@firebasegen/default-connector": "file:dataconnect-generated/js/default-connector",
+    "firebase": "^11.1.0",
     "svelte-spa-router": "^4.0.1"
   }
 }

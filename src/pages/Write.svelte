@@ -1,3 +1,6 @@
+<script>
+</script>
+
 <form id="write-form" action="" enctype="multipart/form-data">
   <div>
     <label for="image">이미지</label>

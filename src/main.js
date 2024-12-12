@@ -1,7 +1,8 @@
 import { mount } from "svelte";
 import App from "./App.svelte";
+import "../firebase.js";
 
-const app = mount(App, {
+const app = new App({
   target: document.getElementById("app"),
 });
 
