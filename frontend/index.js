@@ -1,20 +1,3 @@
-const calcTime = (timestamp) => {
-  const curTime = new Date().getTime() - 9 * 60 * 60 * 1000;
-  const time = new Date(curTime - timestamp);
-  const hour = time.getHours();
-  const min = time.getMinutes();
-  const second = time.getSeconds();
-  if (hour > 0) {
-    return `${hour} 시간전`;
-  } else if (min > 0) {
-    return `${min}분 전`;
-  } else if (second >= 0) {
-    return `${second}초 전`;
-  } else {
-    return `방금 전`;
-  }
-};
-
 const renderData = (data) => {
   const main = document.querySelector("main");
   data.reverse().forEach(async (obj) => {
@@ -40,7 +23,7 @@ const renderData = (data) => {
 
     const InfoMetaDiv = document.createElement("div");
     InfoMetaDiv.className = "item-list__info-meta";
-    InfoMetaDiv.innerText = `${obj.place} ${calcTime(obj.insertAt)}`;
+    InfoMetaDiv.innerText = obj.place + " " + calcTime(obj.insertAt);
 
     const InfoPriceDiv = document.createElement("div");
     InfoPriceDiv.className = "item-list__info-price";
