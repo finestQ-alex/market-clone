@@ -1,6 +1,6 @@
 <script>
   import { onMount } from "svelte";
-  import Footer from "../componets/Footer.svelte";
+  import Nav from "../componets/Nav.svelte";
   import { getDatabase, ref, onValue } from "firebase/database";
 
   let hour = new Date().getHours();
@@ -79,5 +79,5 @@
   {/each}
   <a class="write-btn" href="#/write">+ 글쓰기</a>
 </main>
-<Footer />
+<Nav />
 <div class="media-info-msg">화면 사이즈를 줄여주세요.</div>
